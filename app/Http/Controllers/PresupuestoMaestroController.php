@@ -6,6 +6,8 @@ use App\Models\Presupuesto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class PresupuestoMaestroController extends Controller
@@ -93,6 +95,33 @@ class PresupuestoMaestroController extends Controller
             ->setKeywords('Reportes')
             ->setCategory("Reportes ");
 
+
+        // Establecer el título en la primera fila y combinar celdas A1 y B1
+        $sheet->setCellValue('A1', $getnamepresupuesto->nombre . '    ' . date('Y', strtotime($getnamepresupuesto->fecha_inicio)));
+        $sheet->mergeCells('A1:M1');
+        $sheet->getStyle('A1:M1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'size' => 16,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+        ]);
+        $sheet->getColumnDimension('A')->setWidth(50);
+
+        // para los anchos de las columnas
+        $columns = range('B', 'M');
+        foreach ($columns as $column) {
+            $sheet->getColumnDimension($column)->setWidth(15); // Puedes ajustar el ancho según lo necesites
+        }
+
+        $sheet->getStyle("B2:M2")->applyFromArray([
+            'font' => [
+                'bold' => true,
+            ],
+        ]);
         $sheet->setCellValue('A1', $getnamepresupuesto->nombre . '    ' . date('Y', strtotime($getnamepresupuesto->fecha_inicio)));
         // pitamos las partidas
         $sheet->setCellValue('A2', 'Partida / Detalle');
@@ -109,17 +138,33 @@ class PresupuestoMaestroController extends Controller
         $sheet->setCellValue('L2', 'Noviembre');
         $sheet->setCellValue('M2', 'Diciembre');
         $rowIndex = 3; // Empezar en la fila 3
-
+        // Inicializar el array de totales
+        $totals = array_fill(2, 12, 0);
         foreach ($presupuestos as $item) {
             foreach ($item->partidas as $partida) {
                 $sheet->setCellValue('A' . $rowIndex, $partida->nombre);
+                $sheet->getStyle("A{$rowIndex}:M{$rowIndex}")->applyFromArray([
+                    'font' => [
+                        'bold' => true,
+                    ],
+                    'fill' => [
+                        'fillType' => Fill::FILL_SOLID,
+                        'startColor' => [
+                            'argb' => 'FFCCFFFF', // Color celeste
+                        ],
+                    ],
+                ]);
                 $rowIndex++; // Avanzar a la siguiente fila para los detalles
 
                 foreach ($partida->partida_detalle as $detalle) {
                     $sheet->setCellValue('A' . $rowIndex, $detalle->detalle);
                     $colIndex = 2; // Empezar en la columna B (columna 2)
                     foreach ($detalle->precios as $precio) {
+
                         $sheet->setCellValue([$colIndex, $rowIndex], $precio->monto);
+                        $sheet->getStyle([$colIndex, $rowIndex])->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
+
+                        $totals[$colIndex] += $precio->monto;
                         $colIndex++; // Mover a la siguiente columna
                     }
 
@@ -127,6 +172,27 @@ class PresupuestoMaestroController extends Controller
                 }
             }
         }
+        // Añadir una fila de totales al final de cada columna de precios
+        $totalRowIndex = $rowIndex;
+        $sheet->setCellValue('A' . $totalRowIndex, 'Totales');
+
+        // Escribir los totales acumulados en la fila de totales
+        foreach ($totals as $colIndex => $total) {
+            $sheet->setCellValue([$colIndex, $totalRowIndex], $total);
+            $sheet->getStyle([$colIndex, $totalRowIndex])->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
+        }
+        $sheet->getStyle("A{$totalRowIndex}:M{$totalRowIndex}")->applyFromArray([
+            'font' => [
+                'bold' => true,
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => [
+                    'argb' => 'FFCCFFFF', // Color celeste
+                ],
+            ],
+        ]);
+
 
         $filename = $getnamepresupuesto->nombre . ' ' . date('d-m-y-h-i-s-a') . '.xlsx';
         header('Content-Type: application/vnd.ms-excel');
