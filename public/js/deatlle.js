@@ -113,8 +113,9 @@ $(function () {
             }
             let presupuesto_id = $("#presupuesto_id").val();
             let pr = $("#pr").val();
+            let volver = $("#volver").val();
 
-            let data = { presupuesto_id, pr, titles, meses, montos };
+            let data = { presupuesto_id, volver, pr, titles, meses, montos };
             $.ajax({
                 url: "/admin/partida-detalles",
                 method: "POST",
@@ -130,13 +131,17 @@ $(function () {
                         cancelButtonText: "Seguir agregando mas detalles",
                         showCancelButton: true,
                     }).then((result) => {
-                        console.log(result);
                         let { isConfirmed, isDismissed, isDenied } = result;
                         if (isConfirmed) {
-                            location.href = `../partida/create?uuid=${done.uuid}`;
+                            if (done.volver == "volver") {
+                                location.href = `../ingresar-partidas/${done.uuid}/edit`;
+                            } else {
+                                location.href = `../partida/create?uuid=${done.uuid}`;
+                            }
                         }
                         if (isDismissed) {
                             tablabody.empty();
+                            location.reload();
                         }
                     });
                 })

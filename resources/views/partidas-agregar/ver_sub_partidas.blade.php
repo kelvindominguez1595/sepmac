@@ -1,8 +1,6 @@
 @extends('voyager::master')
 @section('page_header')
-    <h1 class="page-title">
-        <i class="voyager-company"></i> Presupuestos
-    </h1>
+    <h4 class=" page-title"> <i class="voyager-news"></i>{{ $presupuesto->nombre }}</h4>
 @stop
 @section('css')
     <style>
@@ -17,75 +15,71 @@
         .btn.btn-danger {
             text-decoration: none;
         }
-
-        .btn.btn-success {
-            text-decoration: none;
-        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js"
         integrity="sha512-u3fPA7V8qQmhBPNT5quvaXVa1mnnLSXUep5PS1qo5NRzHwG19aHmNJnj1Q8hpA/nBWZtZD4r4AX6YOt5ynLN2g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 @stop
 @section('content')
-    <div class="page-content container-fluid">
+
+    <div class="page-content edit-add container-fluid">
+        @if (count($errors) > 0)
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
 
-        <x-link href="{{ route('presupuestos.create') }}">Crear presupuesto</x-link>
+        <div class="row">
+            <div class="col-md-12 ">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            @foreach ($partidas as $item)
+                                <div class="col-md-3">
+                                    <a
+                                        href="{{ route('ingresar-partidas.create', ['uuid' => $item->id, 'presupuesto' => $item->presupuesto_id]) }}">
+                                        <div class="card border border-secondary"
+                                            style="border-radius:15px; border: 1px solid #337ab7;">
+                                            <div class="card-body">
+                                                <h3 class="text-center">
+                                                    {{ $item->nombre }}
+                                                </h3>
+                                                <hr>
+                                                @php
+                                                    $totalGeneral = 0;
+                                                @endphp
 
+                                                @foreach ($item->partida_detalle as $pd)
+                                                    @foreach ($pd->precios as $pre)
+                                                        @php
+                                                            $totalGeneral += $pre->monto;
+                                                        @endphp
+                                                    @endforeach
+                                                @endforeach
 
-        <x-table>
-            @slot('header')
-                <th>Nombre</th>
-                <th>Año</th>
-                <th>Observaciones</th>
-                <th>Estado</th>
-                <th>Opciones</th>
-            @endslot
-            @slot('body')
-                @foreach ($presupuestos as $presupuesto)
-                    <tr>
-                        <td>{{ $presupuesto->nombre }}</td>
-                        <td class="text-center">{{ date('Y', strtotime($presupuesto->fecha_inicio)) }}</td>
-                        <td>
-                            @isset($presupuesto->observaciones)
-                                {{ $presupuesto->observaciones }}
-                            @endisset
-                        </td>
-                        <td class="text-center">
-                            @if (isset($presupuesto->estado))
-                                {{ $presupuesto->estado }}
-                            @else
-                                En proceso
-                            @endif
-                        </td>
-                        <td>
-                            <x-link class="btn-success" title="Agregar partidas"
-                                href="{{ route('partida.create', ['uuid' => $presupuesto]) }}" role="button">
-                                <i class="fas fa-check"></i>
-                                @if (isset($presupuesto->estado))
-                                    {{ $presupuesto->estado }}
-                                @else
-                                    Sin Aprobar
-                                @endif
-                            </x-link>
+                                                <h4>
+                                                    Total Presupuesto: ${{ number_format($totalGeneral, 2) }}
+                                                </h4>
+                                                <span>Cantidad de partidas: {{ $item->partida_detalle->count() }}</span><br>
+                                                <span>Fecha de creación:
+                                                    {{ date('d-m-Y h:i:s a', strtotime($item->created_at)) }}</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
 
-                            <x-link class="btn-info" title="Agregar partidas"
-                                href="{{ route('partida.create', ['uuid' => $presupuesto]) }}" role="button">
-                                <i class="fas fa-save"></i>
-                                Nueva Partida
-                            </x-link>
+                    </div>
+                </div>
 
-                            <x-link class="btn-info" href="{{ route('presupuestos.edit', $presupuesto) }}" role="button"><i
-                                    class="fas fa-edit"></i> Editar
-                                Presupuesto</x-link>
-                            <x-button class="btn-danger" value="{{ $presupuesto->id }}" id="btnBorrar" role="button"><i
-                                    class="fas fa-trash"></i>
-                                Borrar Presupuesto</x-button>
-                        </td>
-                    </tr>
-                @endforeach
-            @endslot
-        </x-table>
+            </div>
+        </div>
     </div>
 @stop
 
@@ -114,7 +108,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                                url: "/admin/presupuestos/" + id,
+                                url: "/admin/partida/" + id,
                                 method: "DELETE",
                                 dataType: "JSON",
                             })

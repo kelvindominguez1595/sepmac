@@ -20,7 +20,13 @@ class Presupuesto extends Model
         'user_id_created',
         'user_id_deleted',
         'user_id_updated',
-        'estado'
+        'estado',
+        'observaciones'
     ];
     protected $dates = ['deleted_at'];
+
+    public function partidas()
+    {
+        return $this->hasMany(Partida::class);
+    }
 }

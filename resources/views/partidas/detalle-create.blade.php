@@ -45,11 +45,13 @@
 
 
         <div class="row">
-            <div class="col-md-6">
-                <a type="button" class="btn btn-primary" href="{{ route('partida.create', ['uuid' => $pr]) }}">
-                    <i class="voyager-angle-left"></i> Volver
-                </a>
-            </div>
+            @if (empty($isUserNormal))
+                <div class="col-md-6">
+                    <a type="button" class="btn btn-primary" href="{{ route('partida.create', ['uuid' => $pr]) }}">
+                        <i class="voyager-angle-left"></i> Volver
+                    </a>
+                </div>
+            @endif
 
 
             <div class="col-md-12">
@@ -61,6 +63,8 @@
                             autocomplete="false">
                         <input type="hidden" name="pr" id="pr" value="{{ $pr }}"
                             autocomplete="false">
+                        <input type="hidden" name="volver" id="volver"
+                            value="{{ isset($isUserNormal) ? 'volver' : 'buttonactive' }}" autocomplete="false">
                         <div class="table-responsive">
 
                             <table id="tbldetalles" class="table table-striped table-bordered fixed-width-table">
@@ -84,6 +88,40 @@
 
                     </x-form>
 
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Historial de detalle de partidas registradas</h5>
+                    </div>
+                    <div class="card-body">
+                        <x-table>
+                            @slot('header')
+                                <th>Partida</th>
+                                <th>Total General</th>
+                            @endslot
+                            @slot('body')
+                                @foreach ($historial as $item)
+                                    <tr>
+                                        <td>{{ $item->detalle }}</td>
+                                        <td>
+                                            @php
+                                                $totalGeneral = 0;
+                                            @endphp
+                                            @foreach ($item->precios as $pre)
+                                                @php
+                                                    $totalGeneral += $pre->monto;
+                                                @endphp
+                                            @endforeach
+
+                                            ${{ number_format($totalGeneral, 2) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endslot
+                        </x-table>
+                    </div>
                 </div>
             </div>
         </div>

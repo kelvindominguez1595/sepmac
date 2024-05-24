@@ -39,7 +39,14 @@ class PartidasDetalleController extends Controller
             'NOVIEMBRE',
             'DICIEMBRE'
         ];
-        return view('partidas.detalle-create', compact('meses', 'uuid', 'pr'));
+        $historial = PartidasDetalle::where('partida_id', $request['uuid'])->get();
+
+        return view('partidas.detalle-create', compact(
+            'meses',
+            'uuid',
+            'pr',
+            'historial'
+        ));
     }
 
     /**
@@ -51,6 +58,7 @@ class PartidasDetalleController extends Controller
     public function store(Request $request)
     {
         $pr = $request->pr;
+        $volver = $request->volver;
         foreach ($request['titles'] as $key => $value) {
             // creamos el detalle
             $partidaDetalle =  PartidasDetalle::create([
@@ -67,7 +75,7 @@ class PartidasDetalleController extends Controller
                 ]);
             }
         }
-        return response()->json(['message' => 'success', 'uuid' => $pr], 200);
+        return response()->json(['message' => 'success', 'uuid' => $pr, 'volver' => $volver], 200);
     }
 
     /**
