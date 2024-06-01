@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\EgresosController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IngresarPartidasController;
 use App\Http\Controllers\PresupuestosController;
 use App\Http\Controllers\PartidasController;
 use App\Http\Controllers\PartidasDetalleController;
 use App\Http\Controllers\PresupuestoMaestroController;
+use App\Http\Controllers\SalidasController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 /*
@@ -41,6 +43,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::resource('/presupuestos', PresupuestosController::class)->names('presupuestos');
     Route::resource('/partida', PartidasController::class);
     Route::resource('/partida-detalles', PartidasDetalleController::class)->names('partida-detalles');
-    Route::resource('/ingresar-partidas', IngresarPartidasController::class)->names('ingresar-partidas');
+    // Route::resource('/ingresar-partidas', IngresarPartidasController::class)->names('ingresar-partidas');
+    Route::resource('/salidas', SalidasController::class)->names('salidas');
+    Route::resource('/egresos', EgresosController::class)->names('egresos');
     Route::resource('/presupuestos-maestro', PresupuestoMaestroController::class)->names('presupuestos-maestro');
 });

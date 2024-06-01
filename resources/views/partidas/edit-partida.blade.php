@@ -1,6 +1,6 @@
 @extends('voyager::master')
 @section('page_header')
-    <h4 class=" page-title"> <i class="voyager-news"></i>Ver detalles </h4>
+    <h4 class=" page-title"> <i class="voyager-news"></i>Ver cuentas contables </h4>
 @stop
 @section('css')
     <style>

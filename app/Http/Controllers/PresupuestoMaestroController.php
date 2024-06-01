@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Presupuesto;
+use App\Models\Salida;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PresupuestoMaestroController extends Controller
 {
@@ -26,7 +28,9 @@ class PresupuestoMaestroController extends Controller
             ->orderBy('year', 'desc')
             ->get();
 
-        return view('presupuestos.comparar', compact('presupuestos'));
+        $allPresupuesto = Presupuesto::all();
+
+        return view('presupuestos.comparar', compact('presupuestos', 'allPresupuesto'));
     }
 
     /**
@@ -58,9 +62,73 @@ class PresupuestoMaestroController extends Controller
      */
     public function show(Request $request, $id)
     {
-        // VALIDATIONS
-        $validate = $request->validate(['presupuesto' => 'required']);
-        $year = $validate['presupuesto'];
+        if ($id > 0) {
+            $queryPresupuesto = Presupuesto::query();
+            if ('Presupuesto de Ventas' == $request->invidualp) {
+                $data = $queryPresupuesto->where('nombre', $request->invidualp)->first();
+                $pdf = Pdf::loadView('pdf.ventas', compact('data'))
+                    ->setPaper('legal', 'landscape');
+                return $pdf->stream('presupuestoventas.pdf');
+            }
+            if ('Presupuesto de Gastos' == $request->invidualp) {
+                $data = $queryPresupuesto->where('nombre', $request->invidualp)->first();
+                $pdf = Pdf::loadView('pdf.gastos', compact('data'))
+                    ->setPaper('legal', 'landscape');
+                return $pdf->stream('presupuestoventas.pdf');
+            }
+            if ('Presupuesto de Inversión de Maquinaria y Equipo' == $request->invidualp) {
+                $data = $queryPresupuesto->where('nombre', $request->invidualp)->first();
+                $pdf = Pdf::loadView('pdf.inversiones', compact('data'))
+                    ->setPaper('legal', 'landscape');
+                return $pdf->stream('presupuestoventas.pdf');
+            }
+        } else {
+            // VALIDATIONS
+            $validate = $request->validate(['presupuesto' => 'required']);
+            $year = $validate['presupuesto'];
+            return $this->presupuestoGeneral($year);
+        }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        //
+    }
+    public function presupuestoVenta($data)
+    {
+    }
+    public function presupuestoGeneral($year)
+    {
+
         // QUERY CONSULT
         $presupuestos = Presupuesto::with('partidas', 'partidas.partida_detalle')
             ->whereYear(
@@ -159,14 +227,28 @@ class PresupuestoMaestroController extends Controller
                 foreach ($partida->partida_detalle as $detalle) {
                     $sheet->setCellValue('A' . $rowIndex, $detalle->detalle);
                     $colIndex = 2; // Empezar en la columna B (columna 2)
+                    $subtotal = 0; // Inicializar el subtotal para esta fila
                     foreach ($detalle->precios as $precio) {
 
                         $sheet->setCellValue([$colIndex, $rowIndex], $precio->monto);
                         $sheet->getStyle([$colIndex, $rowIndex])->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
 
+                        $subtotal += $precio->monto; // Sumar al subtotal de esta fila
                         $totals[$colIndex] += $precio->monto;
                         $colIndex++; // Mover a la siguiente columna
                     }
+                    // Poner el subtotal al final de la fila
+                    $sheet->setCellValue([$colIndex, $rowIndex], $subtotal);
+                    $sheet->getStyle([$colIndex, $rowIndex])->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
+
+
+
+                    // Calcular el total de salidas por partida_detalle_id utilizando Laravel
+                    $totalSalidas = Salida::where('partida_detalles_id', $detalle->id)->sum('monto');
+                    $colIndex++;
+                    // Poner el total de salidas al final de la fila
+                    $sheet->setCellValue([$colIndex, $rowIndex], $totalSalidas);
+                    $sheet->getStyle([$colIndex, $rowIndex])->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
 
                     $rowIndex++; // Mover a la siguiente fila para el siguiente detalle
                 }
@@ -201,39 +283,5 @@ class PresupuestoMaestroController extends Controller
 
         $write->save('php://output');
         exit;
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

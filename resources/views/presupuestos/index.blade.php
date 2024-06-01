@@ -72,7 +72,7 @@
                             <x-link class="btn-info" title="Agregar partidas"
                                 href="{{ route('partida.create', ['uuid' => $presupuesto]) }}" role="button">
                                 <i class="fas fa-save"></i>
-                                Nueva Partida
+                                Ver centro de costos
                             </x-link>
 
                             <x-link class="btn-info" href="{{ route('presupuestos.edit', $presupuesto) }}" role="button"><i

@@ -33,4 +33,9 @@ class PartidasDetalle extends Model
     {
         return $this->hasMany(PartidasDetallesPrecio::class, 'partida_detalles_id');
     }
+
+    public function salidas()
+    {
+        return $this->hasMany(Salida::class, 'partida_detalles_id');
+    }
 }

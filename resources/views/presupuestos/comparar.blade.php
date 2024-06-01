@@ -56,49 +56,32 @@
                                 </div>
 
 
-                                {{--
-                                <div class="form-group  col-md-12 ">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="exportar_excel" value="si"
-                                            id="exportar_excel">
-                                        <label class="form-check-label" for="exportar_excel">
-                                            ¿Decea exportarlo en Excel? <i class="text-success fa-solid fa-file-excel"></i>
-                                        </label>
-                                    </div>
-                                </div> --}}
 
                             </div>
 
 
                         </x-form>
-                        {{-- <div class="col-md-12">
-                            <span><strong>Nota:</strong> Si necesita saber a detalle el presupuesto maestro por
-                                favor marque la casilla donde dice <strong>¿Decea exportarlo en Excel?</strong>
-                                para que pueda obtener el presupuesto completo, caso contrario solo obtendra el
-                                resultado general del presupuesto maestro</span>
-                        </div> --}}
+
                     </div>
                 </div>
             </div>
             <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
                 <div class="card">
                     <div class="card-body">
-                        <h4>Aqui puedes comparar presupuesto maestros</h4>
-                        {{-- <x-form id="formeditar" action="{{ route('ingresar-partidas.show', 0) }}" method="GET"
-                            btntext="Ir al presupuesto">
+                        <h4>Reporte de presupuesto</h4>
+                        <x-form id="formeditar" action="{{ route('presupuestos-maestro.show', 1) }}" target="_blank"
+                            method="GET" btntext="Descargar presupuesto en PDF">
 
 
                             <div class="row">
-                                <div class="col-md-12">
-                                    Hola aqui puede consultar tu presupuesto maestro
-                                </div>
+
                                 <div class="form-group  col-md-12 ">
-                                    <label for="presupuesto">Seleccione un presupuesto todos los que se listan aqui es
-                                        porque aun no han sido aprobado o tienen una observación</label>
-                                    <select name="presupuesto" id="presupuesto" class="form-control">
+                                    <label for="presupuesto">Seleccione un presupuesto para descargar un pdf con los
+                                        detalles</label>
+                                    <select name="invidualp" id="invidualp" class="form-control">
                                         <option value="">Seleccione....</option>
-                                        @foreach ($presupuestos as $item)
-                                            <option value="{{ $item->year }}">Presupuesto {{ $item->year }}</option>
+                                        @foreach ($allPresupuesto as $pre)
+                                            <option value="{{ $pre->nombre }}">{{ $pre->nombre }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -106,14 +89,8 @@
                             </div>
 
 
-                        </x-form> --}}
-                        <div class="row">
-                            <div class="col-md-12">
-                                <span><strong>Nota:</strong> Debe de seleccionar un presupuesto ya que todos los que se
-                                    listan en esta sección son aquellos que aun no
-                                    estan completos y si tiene algun tipo de observaciones.</span>
-                            </div>
-                        </div>
+                        </x-form>
+
                     </div>
                 </div>
             </div>
@@ -125,7 +102,7 @@
     <script src="{{ asset('js/jquery.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        $(function() {
+        $(document).ready(function() {
             $.ajaxSetup({
                 headers: {
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),

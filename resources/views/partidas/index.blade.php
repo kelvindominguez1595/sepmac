@@ -1,6 +1,6 @@
 @extends('voyager::master')
 @section('page_header')
-    <h4 class=" page-title"> <i class="voyager-news"></i>Partidas del Presupuesto "{{ $presupuesto->nombre }} -
+    <h4 class=" page-title"> <i class="voyager-news"></i>Centro de costos del Presupuesto "{{ $presupuesto->nombre }} -
         {{ date('Y', strtotime($presupuesto->fecha_fin)) }}" </h4>
 @stop
 @section('css')
@@ -70,7 +70,7 @@
                             <th>Partida</th>
                             <th>Creado por</th>
                             <th>Fecha de creación</th>
-                            <th>Total de la partida</th>
+                            <th>Total</th>
                             <th>Opciones</th>
                         @endslot
                         @php
@@ -94,7 +94,11 @@
                                                     @endphp
                                                 @endforeach
                                             @endforeach
-                                            ${{ number_format($totalGeneral, 2) }}
+                                            @if ($partida->nombre == 'Volumen de ventas')
+                                                {{ $totalGeneral }}
+                                            @else
+                                                ${{ number_format($totalGeneral, 2) }}
+                                            @endif
                                             @php
                                                 $totalGlobal += $totalGeneral;
                                             @endphp
@@ -104,7 +108,7 @@
                                             <x-link
                                                 href="{{ route('partida-detalles.create', ['uuid' => $partida, 'presupuesto' => $uuid]) }}">
                                                 <i class="fa-solid fa-plus"></i>
-                                                Agregar Detalles
+                                                Nueva Cuenta contable
                                             </x-link>
                                             <x-link
                                                 href="{{ route('partida-detalles.show', ['partida_detalle' => $partida, 'presupuesto' => $uuid]) }}">
@@ -114,12 +118,12 @@
                                             <x-link
                                                 href="{{ route('partida.edit', ['partida' => $partida, 'presupuesto' => $uuid]) }}">
                                                 <i class="fa-solid fa-pencil"></i>
-                                                Editar partida
+                                                Editar Cuenta contable
                                             </x-link>
                                             <x-button class="btn-danger" type="button" id="btnBorrar"
                                                 value="{{ $partida->id }}">
                                                 <i class="fa-solid fa-trash"></i>
-                                                Borrar partida
+                                                Borrar cuenta contable
                                             </x-button>
                                         </td>
                                     </tr>

@@ -19,6 +19,7 @@ class PartidasDetallesPrecio extends Model
         'user_deleted'
     ];
     protected $dates = ['deleted_at'];
+
     public function partida_detalles()
     {
         return $this->belongsTo(PartidasDetalle::class, 'partida_detalles_id');

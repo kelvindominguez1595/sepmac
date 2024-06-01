@@ -1,6 +1,6 @@
 @extends('voyager::master')
 @section('page_header')
-    <h4 class=" page-title"> <i class="voyager-news"></i>Detalles de la Partida</h4>
+    <h4 class=" page-title"> <i class="voyager-news"></i>Nueva cuenta contables</h4>
 @stop
 @section('css')
     <style>
@@ -70,12 +70,12 @@
                             <table id="tbldetalles" class="table table-striped table-bordered fixed-width-table">
                                 <thead>
                                     <tr>
-                                        <th colspan="11" class="text-center ">
-                                            <h3>Detalles de la partida</h3>
+                                        <th colspan="11" class="text-right ">
+                                            <h3>Presione el boton para crear una nueva cuenta contable ---></h3>
                                         </th>
                                         <th class="text-center">
                                             <x-button type="button" id="btnadd" title="Agregar un detalle a la partida">
-                                                <i class="fa fa-plus"></i></x-button>
+                                                <i class="fa fa-plus"></i> Agregar</x-button>
                                         </th>
                                     </tr>
 
@@ -92,13 +92,13 @@
             </div>
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header">
-                        <h5>Historial de detalle de partidas registradas</h5>
+                    <div class="card-header ">
+                        <span class="text-center">Historial de cuentas contables registradas</span>
                     </div>
                     <div class="card-body">
                         <x-table>
                             @slot('header')
-                                <th>Partida</th>
+                                <th>Cuenta contable</th>
                                 <th>Total General</th>
                             @endslot
                             @slot('body')

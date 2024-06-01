@@ -1,7 +1,7 @@
 <!-- Modal -->
-<div role="dialog" class="modal modal-info fade in" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
+<div role="dialog" class="modal modal-info fade in" id="{{ $idModal }}" tabindex="-1"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
 
