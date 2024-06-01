@@ -6,6 +6,7 @@ use App\Http\Controllers\PresupuestosController;
 use App\Http\Controllers\PartidasController;
 use App\Http\Controllers\PartidasDetalleController;
 use App\Http\Controllers\PresupuestoMaestroController;
+use App\Http\Controllers\ComparativaPresupuestoPDFController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 /*
@@ -43,4 +44,5 @@ Route::group(['prefix' => 'admin'], function () {
     Route::resource('/partida-detalles', PartidasDetalleController::class)->names('partida-detalles');
     Route::resource('/ingresar-partidas', IngresarPartidasController::class)->names('ingresar-partidas');
     Route::resource('/presupuestos-maestro', PresupuestoMaestroController::class)->names('presupuestos-maestro');
+    Route::resource('/generate-pdf', ComparativaPresupuestoPDFController::class)->names('generatePDF');    
 });

@@ -67,8 +67,7 @@
                                     </div>
                                 </div> --}}
 
-                            </div>
-
+                            </div>                            
 
                         </x-form>
                         {{-- <div class="col-md-12">
@@ -115,6 +114,42 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4>Ver comparativa de presupuestos</h4>
+
+                        <x-form id="formprintpresupuestocomparativa" action=""
+                            method="Get" btntext="Ver comparativa" target="_blank">
+
+                            <div class="row">
+                                <div class="form-group  col-md-12 ">
+                                    <label for="presupuesto1">Seleccione el primer presupuesto a comparar</label>
+                                    <select name="presupuesto1" id="presupuesto1" class="form-control">
+                                        <option value="">Seleccione....</option>
+                                        @foreach ($presupuestos as $item)
+                                            <option value="{{ $item->year }}">Presupuesto {{ $item->year }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group  col-md-12 ">
+                                    <label for="presupuesto2">Seleccione el segundo presupuesto a comparar</label>
+                                    <select name="presupuesto2" id="presupuesto2" class="form-control">
+                                        <option value="">Seleccione....</option>
+                                        @foreach ($presupuestos as $item)
+                                            <option value="{{ $item->year }}">Presupuesto {{ $item->year }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>                            
+
+                        </x-form>
+                    </div>                    
                 </div>
             </div>
         </div>
