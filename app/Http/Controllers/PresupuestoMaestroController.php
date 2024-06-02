@@ -82,6 +82,21 @@ class PresupuestoMaestroController extends Controller
                     ->setPaper('legal', 'landscape');
                 return $pdf->stream('presupuestoventas.pdf');
             }
+            if ('Presupuesto de Flujo de Efectivo' == $request->invidualp) {
+                $data = $queryPresupuesto->where('nombre', $request->invidualp)->first();
+                $ventas = Presupuesto::where('nombre', 'Presupuesto de Ventas')->first();
+                $gastos = Presupuesto::where('nombre', 'Presupuesto de Gastos')->first();
+                $inversion = Presupuesto::where('nombre', 'Presupuesto de Inversión de Maquinaria y Equipo')->first();
+
+                $pdf = Pdf::loadView('pdf.efectivo', compact(
+                    'data',
+                    'ventas',
+                    'gastos',
+                    'inversion',
+                ))
+                    ->setPaper('legal', 'landscape');
+                return $pdf->stream('presupuestoventas.pdf');
+            }
         } else {
             // VALIDATIONS
             $validate = $request->validate(['presupuesto' => 'required']);
@@ -165,7 +180,7 @@ class PresupuestoMaestroController extends Controller
 
 
         // Establecer el título en la primera fila y combinar celdas A1 y B1
-        $sheet->setCellValue('A1', $getnamepresupuesto->nombre . '    ' . date('Y', strtotime($getnamepresupuesto->fecha_inicio)));
+        $sheet->setCellValue('A1', ' Presupuesto maestro   ' . date('Y', strtotime($getnamepresupuesto->fecha_inicio)));
         $sheet->mergeCells('A1:M1');
         $sheet->getStyle('A1:M1')->applyFromArray([
             'font' => [
@@ -180,17 +195,17 @@ class PresupuestoMaestroController extends Controller
         $sheet->getColumnDimension('A')->setWidth(50);
 
         // para los anchos de las columnas
-        $columns = range('B', 'M');
+        $columns = range('B', 'O');
         foreach ($columns as $column) {
             $sheet->getColumnDimension($column)->setWidth(15); // Puedes ajustar el ancho según lo necesites
         }
 
-        $sheet->getStyle("B2:M2")->applyFromArray([
+        $sheet->getStyle("B2:O2")->applyFromArray([
             'font' => [
                 'bold' => true,
             ],
         ]);
-        $sheet->setCellValue('A1', $getnamepresupuesto->nombre . '    ' . date('Y', strtotime($getnamepresupuesto->fecha_inicio)));
+        $sheet->setCellValue('A1', 'Presupuesto Maestro' . date('Y', strtotime($getnamepresupuesto->fecha_inicio)));
         // pitamos las partidas
         $sheet->setCellValue('A2', 'Partida / Detalle');
         $sheet->setCellValue('B2', 'Enero');
@@ -205,13 +220,15 @@ class PresupuestoMaestroController extends Controller
         $sheet->setCellValue('K2', 'Octubre');
         $sheet->setCellValue('L2', 'Noviembre');
         $sheet->setCellValue('M2', 'Diciembre');
+        $sheet->setCellValue('N2', 'Total Presupuesto');
+        $sheet->setCellValue('O2', 'Total Real');
         $rowIndex = 3; // Empezar en la fila 3
         // Inicializar el array de totales
         $totals = array_fill(2, 12, 0);
         foreach ($presupuestos as $item) {
             foreach ($item->partidas as $partida) {
                 $sheet->setCellValue('A' . $rowIndex, $partida->nombre);
-                $sheet->getStyle("A{$rowIndex}:M{$rowIndex}")->applyFromArray([
+                $sheet->getStyle("A{$rowIndex}:O{$rowIndex}")->applyFromArray([
                     'font' => [
                         'bold' => true,
                     ],
@@ -255,25 +272,25 @@ class PresupuestoMaestroController extends Controller
             }
         }
         // Añadir una fila de totales al final de cada columna de precios
-        $totalRowIndex = $rowIndex;
-        $sheet->setCellValue('A' . $totalRowIndex, 'Totales');
+        // $totalRowIndex = $rowIndex;
+        // $sheet->setCellValue('A' . $totalRowIndex, 'Totales');
 
-        // Escribir los totales acumulados en la fila de totales
-        foreach ($totals as $colIndex => $total) {
-            $sheet->setCellValue([$colIndex, $totalRowIndex], $total);
-            $sheet->getStyle([$colIndex, $totalRowIndex])->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
-        }
-        $sheet->getStyle("A{$totalRowIndex}:M{$totalRowIndex}")->applyFromArray([
-            'font' => [
-                'bold' => true,
-            ],
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => [
-                    'argb' => 'FFCCFFFF', // Color celeste
-                ],
-            ],
-        ]);
+        // // Escribir los totales acumulados en la fila de totales
+        // foreach ($totals as $colIndex => $total) {
+        //     $sheet->setCellValue([$colIndex, $totalRowIndex], $total);
+        //     $sheet->getStyle([$colIndex, $totalRowIndex])->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
+        // }
+        // $sheet->getStyle("A{$totalRowIndex}:M{$totalRowIndex}")->applyFromArray([
+        //     'font' => [
+        //         'bold' => true,
+        //     ],
+        //     'fill' => [
+        //         'fillType' => Fill::FILL_SOLID,
+        //         'startColor' => [
+        //             'argb' => 'FFCCFFFF', // Color celeste
+        //         ],
+        //     ],
+        // ]);
 
 
         $filename = $getnamepresupuesto->nombre . ' ' . date('d-m-y-h-i-s-a') . '.xlsx';
