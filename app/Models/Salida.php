@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Salida extends Model
 {
 
+    protected $table = 'Salidas';
     protected $fillable = [
         'departamento_id',
         'partida_detalles_id',
